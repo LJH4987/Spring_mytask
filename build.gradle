@@ -31,6 +31,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'mysql:mysql-connector-java:8.0.33' // mysql-connector를 위한 종속성
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2' // jakarta.validation 의존성 스프링 3버전과 호환, 2버전은 스프링 2버전과 호환
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.0.0' // jakarta.persistence 의존성
 }
 
 tasks.named('test') {
