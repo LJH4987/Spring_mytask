@@ -1,6 +1,7 @@
 package com.example.mytask.exception;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -66,4 +67,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNoTasksFoundException(NoTasksFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        if (ex.getMessage().contains("task_name")) {
+            return new ResponseEntity<>("일정 이름은 최소 3자 이상이어야 합니다.", HttpStatus.BAD_REQUEST);
+        }
+        if (ex.getMessage().contains("password")) {
+            return new ResponseEntity<>("비밀번호는 최소 8자 이상이어야 합니다.", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("데이터 무결성에 문제가 발생했습니다.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
 }

@@ -5,16 +5,14 @@ import com.example.mytask.exception.PasswordMismatchException;
 import com.example.mytask.exception.ResourceNotFoundException;
 import com.example.mytask.exception.TasksNotFoundException;
 import com.example.mytask.model.Task;
-import com.example.mytask.repository.JdbcTaskRepository;
 import com.example.mytask.repository.TaskRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,11 +84,21 @@ public class TaskService {
 
 
     public TaskDto createTask(TaskDto taskDto) {
+        validateTask(taskDto);
         Task task = mapToEntity(taskDto);
         task.setCreatedAt(LocalDateTime.now());
         task.setUpdatedAt(LocalDateTime.now());
         Task savedTask = taskRepository.save(task);
         return mapToDto(savedTask);
+    }
+
+    private void validateTask(TaskDto taskDto) {
+        if (taskDto.getTaskName() == null || taskDto.getTaskName().length() < 3) {
+            throw new IllegalArgumentException("일정 이름은 최소 3자 이상이어야 합니다.");
+        }
+        if (taskDto.getPassword() == null || taskDto.getPassword().length() < 8) {
+            throw new IllegalArgumentException("비밀번호는 최소 8자 이상이어야 합니다.");
+        }
     }
 
     public Task updateTask(Long id, TaskDto taskDetails, String password) {
@@ -101,9 +109,8 @@ public class TaskService {
             throw new PasswordMismatchException("잘못된 비밀번호입니다.");
         }
 
-        task.setTaskName(taskDetails.getTaskName());
         task.setAssigneeId(taskDetails.getAssigneeId());
-        task.setPassword(taskDetails.getPassword());
+        task.setTaskName(taskDetails.getTaskName());
         task.setUpdatedAt(LocalDateTime.now());
 
         taskRepository.update(task);
@@ -136,6 +143,7 @@ public class TaskService {
         TaskDto taskDto = new TaskDto();
         taskDto.setTaskName(task.getTaskName());
         taskDto.setAssigneeId(task.getAssigneeId());
+        taskDto.setPassword(task.getPassword());
         taskDto.setCreatedAt(task.getCreatedAt());
         taskDto.setUpdatedAt(task.getUpdatedAt());
         return taskDto;
