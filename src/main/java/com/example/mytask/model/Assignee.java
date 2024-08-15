@@ -1,11 +1,8 @@
 package com.example.mytask.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.*;
 
-// 엔티티는 데이터베이스컬럼이랑 매핑되서 영어로 유지시키는게 좋으니 함부러 한글로 바꾸지 말자
-// 나중에도 협업할떄도 영어로 유지시키는게 좋음... 아마도?
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "assignees")
@@ -15,10 +12,10 @@ public class Assignee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -27,10 +24,7 @@ public class Assignee {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Task> tasks;
-
-    // Getters and Setters
+    // Getters :: Setters
     public Long getId() {
         return id;
     }
@@ -69,13 +63,5 @@ public class Assignee {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
     }
 }

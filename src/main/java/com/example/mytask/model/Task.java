@@ -1,12 +1,13 @@
 package com.example.mytask.model;
 
+import com.example.mytask.dto.TaskDto;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tasks")
-public class Task {
+public class Task extends TaskDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +19,10 @@ public class Task {
     @Column(name = "assignee_id", nullable = false)
     private Long assigneeId;
 
-    @Column(nullable = false)
+    @Column(name = "assignee_name", nullable = false, length = 100)
+    private String assigneeName;
+
+    @Column(nullable = true)
     private String password;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -52,6 +56,13 @@ public class Task {
         this.assigneeId = assigneeId;
     }
 
+    public void setAssigneeName(String assigneeName) {
+        this.assigneeName = assigneeName;
+    }
+
+    public String getAssigneeName() {
+        return assigneeName;
+    }
     public String getPassword() {
         return password;
     }

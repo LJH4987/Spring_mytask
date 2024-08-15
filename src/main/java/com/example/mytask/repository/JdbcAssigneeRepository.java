@@ -3,10 +3,14 @@ package com.example.mytask.repository;
 import com.example.mytask.model.Assignee;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 
 @Repository
@@ -19,22 +23,35 @@ public class JdbcAssigneeRepository implements AssigneeRepository {
     }
 
     @Override
-    public void save(Assignee assignee) {
+    public Assignee save(Assignee assignee) {
         String sql = "INSERT INTO Assignee (name, email, created_at, updated_at) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, assignee.getName(), assignee.getEmail(), assignee.getCreatedAt(), assignee.getUpdatedAt());
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, new String[] {"id"});
+            ps.setString(1, assignee.getName());
+            ps.setString(2, assignee.getEmail());
+            ps.setTimestamp(3, Timestamp.valueOf(assignee.getCreatedAt()));
+            ps.setTimestamp(4, Timestamp.valueOf(assignee.getUpdatedAt()));
+            return ps;
+        }, keyHolder);
+
+        assignee.setId(keyHolder.getKey().longValue());
+
+        return assignee;
     }
 
     @Override
-    public Optional<Assignee> findById(int id) {
+    public Optional<Assignee> findById(Long id) {
         String sql = "SELECT * FROM Assignee WHERE id = ?";
-        return jdbcTemplate.query(sql, new Object[]{id}, new AssigneeRowMapper())
-                .stream()
-                .findFirst();
+        List<Assignee> result = jdbcTemplate.query(sql, new Object[]{id}, new AssigneeRowMapper());
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
     @Override
     public List<Assignee> findAll() {
-        String sql = "SELECT * FROM Assignee ORDER BY created_at DESC";
+        String sql = "SELECT * FROM Assignee";
         return jdbcTemplate.query(sql, new AssigneeRowMapper());
     }
 
@@ -45,7 +62,7 @@ public class JdbcAssigneeRepository implements AssigneeRepository {
     }
 
     @Override
-    public void deleteById(int id) {
+    public void deleteById(Long id) {
         String sql = "DELETE FROM Assignee WHERE id = ?";
         jdbcTemplate.update(sql, id);
     }

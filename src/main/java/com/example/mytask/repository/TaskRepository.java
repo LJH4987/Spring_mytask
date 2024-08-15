@@ -1,28 +1,29 @@
 package com.example.mytask.repository;
 
 import com.example.mytask.model.Task;
+import org.springframework.data.domain.Pageable;
 import java.util.*;
 
 public interface TaskRepository {
 
-    // 일정 생성
     Task save(Task task);
-
-    // 특정 ID 일정 조회
-    Optional<Task> findById(long id);
-
-    // 모든 일정 조회 (필터링 조건 포함)
-    List<Task> findAllByAssigneeIdAndModifiedDate(int assigneeId, String modifiedDate);
 
     Optional<Task> findById(Long id);
 
-    List<Task> findAllByAssigneeIdAndModifiedDate(Long assigneeId, String modifiedDate);
+    List<Task> findAll();
 
-    // 일정 수정
+    List<Task> findAll(Pageable pageable);
+
+    List<Task> findAllByAssigneeId(Long assigneeId);
+
     void update(Task task);
 
-    // 일정 삭제
-    void deleteById(int id);
-
     void deleteById(Long id);
+
+    List<Task> findAllByAssigneeNameAndModifiedDate(String assigneeName, String modifiedDate);
+
+    List<Task> findAllByAssigneeName(String assigneeName, Pageable pageable);
+
+    List<Task> findAllByModifiedDate(String modifiedDate, Pageable pageable);
+
 }

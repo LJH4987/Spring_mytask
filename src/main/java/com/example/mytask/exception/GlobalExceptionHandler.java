@@ -1,35 +1,69 @@
 package com.example.mytask.exception;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice // 예외를 처리하는 클래스 어노테이션
+import java.util.*;
+
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 400 Bad Request (입력값이 잘못됨 )
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
-        return new ResponseEntity<>("잘못된 입력입니다. : " + ex.getBindingResult().getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<String> handleDuplicateKeyException(DuplicateKeyException ex) {
+        if (ex.getMessage().contains("assignee.email")) {
+            return new ResponseEntity<>("이미 존재하는 이메일 주소입니다.", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("중복된 값이 있습니다: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    // 401 Unauthorized (비밀번호 불일치 )
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PasswordRequiredException.class)
+    public ResponseEntity<String> handlePasswordRequiredException(PasswordRequiredException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(PasswordMismatchException.class)
     public ResponseEntity<String> handlePasswordMismatchException(PasswordMismatchException ex) {
-        return new ResponseEntity<>("비밀번호가 일치하지 않습니다. : " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    // 404 Not Found (특정 ID의 일정이 없을 때 )
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<String> handleDataAccessException(DataAccessException ex) {
+        return new ResponseEntity<>("데이터베이스 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<String> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        StringBuilder errorMessage = new StringBuilder("잘못된 HTTP 메서드입니다. 사용 가능한 메서드 : ");
+        for (HttpMethod method : ex.getSupportedHttpMethods()) {
+            errorMessage.append(method.name()).append(" ");
+        }
+        return new ResponseEntity<>(errorMessage.toString().trim(), HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        return new ResponseEntity<>("리소스를 찾을 수 없습니다.: " + ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    // 500 Internal Server Error (기타 예상불가 예외 )
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGenericException(Exception ex) {
-        return new ResponseEntity<>("서버 오류가 발생했습니다. : " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(NoTasksFoundException.class)
+    public ResponseEntity<String> handleNoTasksFoundException(NoTasksFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

@@ -4,17 +4,21 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDateTime;
+
 public class TaskDto {
 
-    @NotBlank(message = "일정 제목은 필수입니다.")
-    @Size(max = 200, message = "일정 제목은 200자를 초과할 수 없습니다.")
+    @NotBlank(message = "일정 내용은 필수입니다.")
+    @Size(max = 200, message = "일정 내용은 200자를 초과할 수 없습니다.")
     private String taskName;
 
-    @NotNull(message = "담당자 이름은 필수입니다.")
+    @NotNull(message = "담당자 정보는 필수입니다.")
     private Long assigneeId;
 
-    @NotBlank(message = "비밀번호 입력은 필수입니다.")
     private String password;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     // Getters and Setters
     public String getTaskName() {
@@ -39,5 +43,21 @@ public class TaskDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
