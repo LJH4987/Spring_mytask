@@ -5,7 +5,9 @@ import com.example.mytask.exception.PasswordMismatchException;
 import com.example.mytask.exception.ResourceNotFoundException;
 import com.example.mytask.exception.TasksNotFoundException;
 import com.example.mytask.model.Task;
+import com.example.mytask.repository.JdbcTaskRepository;
 import com.example.mytask.repository.TaskRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,8 @@ public class TaskService {
     }
 
     public List<TaskDto> getAllTasks(int page, int size) {
-        return taskRepository.findAll().stream()
+        Pageable pageable = PageRequest.of(page, size);
+        return taskRepository.findAll(pageable).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
