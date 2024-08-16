@@ -53,7 +53,7 @@ RESTful API의 테스트 및 디버깅 도구로, 클라이언트가 보낼 요�
 
 ![ERD Diagram2](LastERD.png)
 
-![Package Diagram](Package Diagram.png)
+![Package Diagram](https://github.com/user-attachments/assets/fa5bd292-3dad-45e4-8d66-f4fc35753de9)
 
 ![API](API.PNG)
 
