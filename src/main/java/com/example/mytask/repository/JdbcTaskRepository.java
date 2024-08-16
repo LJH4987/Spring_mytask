@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public class JdbcTaskRepository implements TaskRepository {
             ps.setLong(2, task.getAssigneeId());
             ps.setString(3, task.getPassword());
             ps.setTimestamp(4, Timestamp.valueOf(task.getCreatedAt()));
-            ps.setNull(5, java.sql.Types.TIMESTAMP);
+            ps.setTimestamp(5, Timestamp.valueOf(task.getUpdatedAt() != null ? task.getUpdatedAt() : LocalDateTime.now()));
             return ps;
         }, keyHolder);
 
