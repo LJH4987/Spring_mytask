@@ -32,10 +32,10 @@ INSERT INTO Assignee (name, email) VALUES ('박춘식', 'park543@example.com');
 
 -- Task 테이블에 더미 데이터 삽입
 INSERT INTO Task (task_name, assignee_id, password, created_at, updated_at)
-VALUES ('프로젝트 설계', 1, 'password123', '2024-08-15', NULL);
+VALUES ('프로젝트 설계', 1, 'password123', '2024-08-15', '2024-08-15');
 
 INSERT INTO Task (task_name, assignee_id, password, created_at, updated_at )
-VALUES ('개발 진행', 2, 'password123', '2024-09-15', NULL);
+VALUES ('개발 진행', 2, 'password123', '2024-09-15', '2024-08-15');
 
 INSERT INTO Task (task_name, assignee_id, password, created_at, updated_at )
-VALUES ('코드 리뷰', 3, 'password123', '2024-010-15', NULL);
+VALUES ('코드 리뷰', 3, 'password123', '2024-010-15', '2024-08-15');
