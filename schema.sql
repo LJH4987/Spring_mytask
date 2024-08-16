@@ -1,3 +1,7 @@
+-- 데이터베이스 생성
+DROP DATABASE IF EXISTS myschedule;
+CREATE DATABASE IF NOT EXISTS myschedule;
+
 USE myschedule; -- 데이터베이스 선택
 
 -- 담당자 테이블
