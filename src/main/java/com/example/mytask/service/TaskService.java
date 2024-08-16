@@ -150,7 +150,7 @@ public class TaskService {
         task.setAssigneeId(taskDto.getAssigneeId());
         task.setPassword(taskDto.getPassword());
         task.setCreatedAt(taskDto.getCreatedAt());
-        task.setUpdatedAt(LocalDateTime.now());
+        task.setUpdatedAt(taskDto.getUpdatedAt());
         return task;
     }
 

@@ -37,7 +37,7 @@ public class JdbcTaskRepository implements TaskRepository {
             ps.setLong(2, task.getAssigneeId());
             ps.setString(3, task.getPassword());
             ps.setTimestamp(4, Timestamp.valueOf(task.getCreatedAt()));
-            ps.setTimestamp(5, Timestamp.valueOf(task.getUpdatedAt()));
+            ps.setNull(5, java.sql.Types.TIMESTAMP);
             return ps;
         }, keyHolder);
 
