@@ -12,7 +12,7 @@ public interface AssigneeRepository {
 
     List<Assignee> findAll();
 
-    void update(Assignee assignee);
+    Assignee update(Assignee assignee);
 
     void deleteById(Long id);
 

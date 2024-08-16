@@ -12,7 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.List;
+
+import java.util.*;
 import java.util.Optional;
 
 @Repository
@@ -53,11 +54,6 @@ public class JdbcTaskRepository implements TaskRepository {
     }
 
     @Override
-    public List<Task> findAll() {
-        return List.of();
-    }
-
-    @Override
     public List<Task> findAll(Pageable pageable) {
         String sql = "SELECT * FROM Task ORDER BY updated_at DESC LIMIT ? OFFSET ?";
         return jdbcTemplate.query(sql, new Object[]{pageable.getPageSize(), pageable.getOffset()}, new TaskRowMapper());
@@ -81,24 +77,51 @@ public class JdbcTaskRepository implements TaskRepository {
         return jdbcTemplate.query(sql, new Object[]{assigneeId}, new TaskRowMapper());
     }
 
-
     @Override
-    public List<Task> findAllByAssigneeNameAndModifiedDate(String assigneeName, String modifiedDate) {
-        String sql = "SELECT t.* FROM Task t " +
-                "JOIN Assignee a ON t.assignee_id = a.id " +
-                "WHERE a.name = ? AND t.updated_at >= ?";
-        return jdbcTemplate.query(sql, new Object[]{assigneeName, modifiedDate}, new TaskRowMapper());
+    public List<Task> findAllByAssigneeNameAndModifiedDate(String assigneeName, String modifiedDate, Pageable pageable) {
+        String sql;
+        Object[] params;
+
+        if (assigneeName != null && !assigneeName.isEmpty() && modifiedDate != null && !modifiedDate.isEmpty()) {
+            sql = "SELECT t.* FROM Task t " +
+                    "JOIN Assignee a ON t.assignee_id = a.id " +
+                    "WHERE a.name = ? AND DATE(t.updated_at) = ? " +
+                    "ORDER BY t.updated_at DESC LIMIT ? OFFSET ?";
+            params = new Object[]{assigneeName, modifiedDate, pageable.getPageSize(), pageable.getOffset()};
+        } else if (assigneeName != null && !assigneeName.isEmpty()) {
+            sql = "SELECT t.* FROM Task t " +
+                    "JOIN Assignee a ON t.assignee_id = a.id " +
+                    "WHERE a.name = ? " +
+                    "ORDER BY t.updated_at DESC LIMIT ? OFFSET ?";
+            params = new Object[]{assigneeName, pageable.getPageSize(), pageable.getOffset()};
+        } else if (modifiedDate != null && !modifiedDate.isEmpty()) {
+            sql = "SELECT t.* FROM Task t " +
+                    "WHERE DATE(t.updated_at) = ? " +
+                    "ORDER BY t.updated_at DESC LIMIT ? OFFSET ?";
+            params = new Object[]{modifiedDate, pageable.getPageSize(), pageable.getOffset()};
+        } else {
+            sql = "SELECT t.* FROM Task t " +
+                    "ORDER BY t.updated_at DESC LIMIT ? OFFSET ?";
+            params = new Object[]{pageable.getPageSize(), pageable.getOffset()};
+        }
+
+        return jdbcTemplate.query(sql, params, new TaskRowMapper());
     }
 
     @Override
     public List<Task> findAllByAssigneeName(String assigneeName, Pageable pageable) {
-        String sql = "SELECT t.* FROM Task t JOIN Assignee a ON t.assignee_id = a.id WHERE a.name = ? ORDER BY t.updated_at DESC LIMIT ? OFFSET ?";
+        String sql = "SELECT t.* FROM Task t " +
+                "JOIN Assignee a ON t.assignee_id = a.id " +
+                "WHERE a.name = ? " +
+                "ORDER BY t.updated_at DESC LIMIT ? OFFSET ?";
         return jdbcTemplate.query(sql, new Object[]{assigneeName, pageable.getPageSize(), pageable.getOffset()}, new TaskRowMapper());
     }
 
     @Override
     public List<Task> findAllByModifiedDate(String modifiedDate, Pageable pageable) {
-        String sql = "SELECT * FROM Task WHERE DATE(updated_at) = ? ORDER BY updated_at DESC LIMIT ? OFFSET ?";
+        String sql = "SELECT * FROM Task " +
+                "WHERE DATE(updated_at) = ? " +
+                "ORDER BY updated_at DESC LIMIT ? OFFSET ?";
         return jdbcTemplate.query(sql, new Object[]{modifiedDate, pageable.getPageSize(), pageable.getOffset()}, new TaskRowMapper());
     }
 
@@ -110,8 +133,18 @@ public class JdbcTaskRepository implements TaskRepository {
             task.setTaskName(rs.getString("task_name"));
             task.setAssigneeId(rs.getLong("assignee_id"));
             task.setPassword(rs.getString("password"));
-            task.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-            task.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+            Timestamp createdAtTimestamp = rs.getTimestamp("created_at");
+            if (createdAtTimestamp != null) {
+                task.setCreatedAt(createdAtTimestamp.toLocalDateTime());
+            } else {
+                task.setCreatedAt(null);
+            }
+            Timestamp updatedAtTimestamp = rs.getTimestamp("updated_at");
+            if (updatedAtTimestamp != null) {
+                task.setUpdatedAt(updatedAtTimestamp.toLocalDateTime());
+            } else {
+                task.setUpdatedAt(null);
+            }
             return task;
         }
     }

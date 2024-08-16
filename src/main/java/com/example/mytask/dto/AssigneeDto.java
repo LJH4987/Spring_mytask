@@ -12,9 +12,21 @@ public class AssigneeDto {
     @Email(message = "유효한 이메일 주소를 입력해주세요.")
     private String email;
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    // Getters
+    public String getName() {
+        return name;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getEmail() {
+        return email;
+    }
+
+    // Setters
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

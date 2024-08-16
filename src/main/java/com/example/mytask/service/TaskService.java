@@ -3,15 +3,18 @@ package com.example.mytask.service;
 import com.example.mytask.dto.TaskDto;
 import com.example.mytask.exception.PasswordMismatchException;
 import com.example.mytask.exception.ResourceNotFoundException;
-import com.example.mytask.exception.TasksNotFoundException;
+import com.example.mytask.exception.NoTasksFoundException;
 import com.example.mytask.model.Task;
 import com.example.mytask.repository.TaskRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.config.PageableHandlerMethodArgumentResolverCustomizer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,9 +23,11 @@ import java.util.stream.Collectors;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final PageableHandlerMethodArgumentResolverCustomizer pageableCustomizer;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, PageableHandlerMethodArgumentResolverCustomizer pageableCustomizer) {
         this.taskRepository = taskRepository;
+        this.pageableCustomizer = pageableCustomizer;
     }
 
     public List<TaskDto> getAllTasks(int page, int size) {
@@ -41,30 +46,41 @@ public class TaskService {
     public List<TaskDto> getTasksByAssigneeId(Long assigneeId, int page, int size) {
         List<Task> tasks = taskRepository.findAllByAssigneeId(assigneeId);
         if (tasks.isEmpty()) {
-            throw new TasksNotFoundException("해당 담당자의 일정을 찾을 수 없습니다.");
+            throw new NoTasksFoundException("해당 담당자의 일정을 찾을 수 없습니다.");
         }
         return tasks.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
-
 
     public List<TaskDto> getTasksByAssigneeNameAndModifiedDate(String assigneeName, String modifiedDate, int page, int size) {
-        List<Task> tasks = taskRepository.findAllByAssigneeNameAndModifiedDate(assigneeName, modifiedDate);
-        if (tasks.isEmpty()) {
-            throw new TasksNotFoundException("해당 담당자의 일정을 찾을 수 없습니다.");
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt"));
+        List<Task> tasks;
+
+        if (assigneeName != null && modifiedDate != null) {
+            tasks = taskRepository.findAllByAssigneeNameAndModifiedDate(assigneeName, modifiedDate, pageable);
+        } else if (assigneeName != null) {
+            tasks = taskRepository.findAllByAssigneeName(assigneeName, pageable);
+        } else if (modifiedDate != null) {
+            tasks = taskRepository.findAllByModifiedDate(modifiedDate, pageable);
+        } else {
+            tasks = taskRepository.findAll(pageable);
         }
+
+        if (tasks.isEmpty()) {
+            throw new NoTasksFoundException("해당 조건에 맞는 일정을 찾을 수 없습니다.");
+        }
+
         return tasks.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
-
 
     public List<TaskDto> getTasksByAssigneeName(String assigneeName, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<Task> tasks = taskRepository.findAllByAssigneeName(assigneeName, pageable);
         if (tasks.isEmpty()) {
-            throw new TasksNotFoundException("해당 담당자의 일정을 찾을 수 없습니다.");
+            throw new NoTasksFoundException("해당 담당자의 일정을 찾을 수 없습니다.");
         }
         return tasks.stream()
                 .map(this::mapToDto)
@@ -75,13 +91,12 @@ public class TaskService {
         Pageable pageable = PageRequest.of(page, size);
         List<Task> tasks = taskRepository.findAllByModifiedDate(modifiedDate, pageable);
         if (tasks.isEmpty()) {
-            throw new TasksNotFoundException("해당 수정일의 일정을 찾을 수 없습니다.");
+            throw new NoTasksFoundException("해당 수정일의 일정을 찾을 수 없습니다.");
         }
         return tasks.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
-
 
     public TaskDto createTask(TaskDto taskDto) {
         validateTask(taskDto);
@@ -148,5 +163,4 @@ public class TaskService {
         taskDto.setUpdatedAt(task.getUpdatedAt());
         return taskDto;
     }
-
 }

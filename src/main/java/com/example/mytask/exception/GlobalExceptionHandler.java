@@ -17,14 +17,7 @@ import java.util.*;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<String> handleDuplicateKeyException(DuplicateKeyException ex) {
-        if (ex.getMessage().contains("assignee.email")) {
-            return new ResponseEntity<>("이미 존재하는 이메일 주소입니다.", HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>("중복된 값이 있습니다: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
+    // 유효성 검사 관련 예외
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -34,40 +27,40 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+    // 일반적인 예외
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    // 비밀번호 관련 예외
     @ExceptionHandler(PasswordRequiredException.class)
     public ResponseEntity<String> handlePasswordRequiredException(PasswordRequiredException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    // 비밀번호 불일치 예외
     @ExceptionHandler(PasswordMismatchException.class)
     public ResponseEntity<String> handlePasswordMismatchException(PasswordMismatchException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    // 중복 키 예외
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<String> handleDuplicateKeyException(DuplicateKeyException ex) {
+        if (ex.getMessage().contains("assignee.email")) {
+            return new ResponseEntity<>("이미 존재하는 이메일 주소입니다.", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("중복된 값이 있습니다: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    // 데이터베이스 관련 예외
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<String> handleDataAccessException(DataAccessException ex) {
         return new ResponseEntity<>("데이터베이스 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<String> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
-        StringBuilder errorMessage = new StringBuilder("잘못된 HTTP 메서드입니다. 사용 가능한 메서드 : ");
-        for (HttpMethod method : ex.getSupportedHttpMethods()) {
-            errorMessage.append(method.name()).append(" ");
-        }
-        return new ResponseEntity<>(errorMessage.toString().trim(), HttpStatus.METHOD_NOT_ALLOWED);
-    }
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(NoTasksFoundException.class)
-    public ResponseEntity<String> handleNoTasksFoundException(NoTasksFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
+    // 데이터 무결성 위반 예외
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         if (ex.getMessage().contains("task_name")) {
@@ -79,9 +72,25 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("데이터 무결성에 문제가 발생했습니다.", HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    // HTTP 메서드 지원 예외
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<String> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        StringBuilder errorMessage = new StringBuilder("잘못된 HTTP 메서드입니다. 사용 가능한 메서드 : ");
+        for (HttpMethod method : ex.getSupportedHttpMethods()) {
+            errorMessage.append(method.name()).append(" ");
+        }
+        return new ResponseEntity<>(errorMessage.toString().trim(), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
+    // 리소스 찾기 실패 예외
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    // 할 일 목록이 없을 때 예외
+    @ExceptionHandler(NoTasksFoundException.class)
+    public ResponseEntity<String> handleNoTasksFoundException(NoTasksFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }

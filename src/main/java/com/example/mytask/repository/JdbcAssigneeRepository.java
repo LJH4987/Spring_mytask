@@ -56,9 +56,10 @@ public class JdbcAssigneeRepository implements AssigneeRepository {
     }
 
     @Override
-    public void update(Assignee assignee) {
+    public Assignee update(Assignee assignee) {
         String sql = "UPDATE Assignee SET name = ?, email = ?, updated_at = ? WHERE id = ?";
         jdbcTemplate.update(sql, assignee.getName(), assignee.getEmail(), assignee.getUpdatedAt(), assignee.getId());
+        return assignee;
     }
 
     @Override

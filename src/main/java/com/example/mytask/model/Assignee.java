@@ -24,7 +24,7 @@ public class Assignee {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    // Getters :: Setters
+    // Getters and Setters
     public Long getId() {
         return id;
     }

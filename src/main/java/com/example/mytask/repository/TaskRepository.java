@@ -10,8 +10,6 @@ public interface TaskRepository {
 
     Optional<Task> findById(Long id);
 
-    List<Task> findAll();
-
     List<Task> findAll(Pageable pageable);
 
     List<Task> findAllByAssigneeId(Long assigneeId);
@@ -20,7 +18,7 @@ public interface TaskRepository {
 
     void deleteById(Long id);
 
-    List<Task> findAllByAssigneeNameAndModifiedDate(String assigneeName, String modifiedDate);
+    List<Task> findAllByAssigneeNameAndModifiedDate(String assigneeName, String modifiedDate , Pageable pageable);
 
     List<Task> findAllByAssigneeName(String assigneeName, Pageable pageable);
 

@@ -56,13 +56,14 @@ public class Task extends TaskDto {
         this.assigneeId = assigneeId;
     }
 
+    public String getAssigneeName() {
+        return assigneeName;
+    }
+
     public void setAssigneeName(String assigneeName) {
         this.assigneeName = assigneeName;
     }
 
-    public String getAssigneeName() {
-        return assigneeName;
-    }
     public String getPassword() {
         return password;
     }
