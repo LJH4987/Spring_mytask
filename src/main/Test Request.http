@@ -1,8 +1,0 @@
-POST http://localhost:8080/tasks
-Content-Type: application/json
-
-{
-    "taskName": "Test Task",
-    "assigneeId": 1,
-    "password": "password123"
-}

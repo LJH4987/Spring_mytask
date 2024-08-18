@@ -49,4 +49,5 @@ public class AssigneeController {
         assigneeService.deleteAssignee(id);
         return ResponseEntity.ok("담당자가 성공적으로 삭제되었습니다.");
     }
+
 }

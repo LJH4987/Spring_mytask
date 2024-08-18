@@ -1,0 +1,205 @@
+@startuml
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<DTO>> LightGray
+    BackgroundColor<<Model>> LightPink
+    BackgroundColor<<Database>> LightCyan
+    BackgroundColor<<Exception>> LightSalmon
+    BorderColor Black
+    ArrowColor Black
+    ClassFontSize 10
+}
+
+package "Controller" {
+    class TaskController <<Controller>> {
+        - TaskService taskService
+        + List<TaskDto> getAllTasks(Integer page, Integer size)
+        + ResponseEntity<TaskDto> getTaskById(Long id)
+        + ResponseEntity<TaskDto> createTask(TaskDto taskDto)
+        + ResponseEntity<TaskDto> updateTask(Long id, TaskDto taskDto, String password)
+        + ResponseEntity<String> deleteTask(Long id, String password)
+    }
+
+    class AssigneeController <<Controller>> {
+        - AssigneeService assigneeService
+        + List<Assignee> getAllAssignees()
+        + ResponseEntity<Assignee> getAssigneeById(Long id)
+        + ResponseEntity<Assignee> createAssignee(AssigneeDto assigneeDto)
+        + ResponseEntity<Assignee> updateAssignee(Long id, AssigneeDto assigneeDto)
+        + ResponseEntity<String> deleteAssignee(Long id)
+    }
+}
+
+package "Service" {
+    class TaskService <<Service>> {
+        - TaskRepository taskRepository
+        - AssigneeService assigneeService
+        + List<TaskDto> getAllTasks(int page, int size)
+        + TaskDto getTaskById(Long id)
+        + List<TaskDto> getTasksByAssigneeId(Long assigneeId, int page, int size)
+        + List<TaskDto> getTasksByAssigneeNameAndModifiedDate(String assigneeName, String modifiedDate, int page, int size)
+        + List<TaskDto> getTasksByAssigneeName(String assigneeName, int page, int size)
+        + List<TaskDto> getTasksByModifiedDate(String modifiedDate, int page, int size)
+        + TaskDto createTask(TaskDto taskDto)
+        + Task updateTask(Long id, TaskDto taskDetails, String password)
+        + void deleteTask(Long id, String password)
+    }
+
+    class AssigneeService <<Service>> {
+        - AssigneeRepository assigneeRepository
+        + List<Assignee> getAllAssignees()
+        + Assignee getAssigneeById(Long id)
+        + Assignee createAssignee(AssigneeDto assigneeDto)
+        + Assignee updateAssignee(Long id, AssigneeDto assigneeDto)
+        + void deleteAssignee(Long id)
+    }
+}
+
+package "Repository" {
+    interface TaskRepository <<Repository>> {
+        + Page<Task> findAll(Pageable pageable)
+        + List<Task> findAllByAssigneeId(Long assigneeId)
+        + List<Task> findAllByAssigneeNameAndModifiedDate(String assigneeName, String modifiedDate)
+        + List<Task> findAllByAssigneeName(String assigneeName, Pageable pageable)
+        + List<Task> findAllByModifiedDate(String modifiedDate, Pageable pageable)
+    }
+
+    class JdbcTaskRepository <<Repository>> {
+        - JdbcTemplate jdbcTemplate
+        + Page<Task> findAll(Pageable pageable)
+        + List<Task> findAllByAssigneeId(Long assigneeId)
+        + List<Task> findAllByAssigneeNameAndModifiedDate(String assigneeName, String modifiedDate)
+        + List<Task> findAllByAssigneeName(String assigneeName, Pageable pageable)
+        + List<Task> findAllByModifiedDate(String modifiedDate, Pageable pageable)
+    }
+
+    interface AssigneeRepository <<Repository>> {
+        + List<Assignee> findAll()
+        + Optional<Assignee> findById(Long id)
+        + Assignee save(Assignee assignee)
+        + void deleteById(Long id)
+    }
+
+    class JdbcAssigneeRepository <<Repository>> {
+        - JdbcTemplate jdbcTemplate
+        + List<Assignee> findAll()
+        + Optional<Assignee> findById(Long id)
+        + Assignee save(Assignee assignee)
+        + void deleteById(Long id)
+    }
+}
+
+package "DTO & Model" {
+    class TaskDto <<DTO>> {
+        + Long id
+        + String title
+        + String description
+        + Long assigneeId
+        + String modifiedDate
+    }
+
+    class AssigneeDto <<DTO>> {
+        + Long id
+        + String name
+        + String email
+    }
+
+    class Task <<Model>> {
+        + Long id
+        + String title
+        + String description
+        + Long assigneeId
+        + String modifiedDate
+    }
+
+    class Assignee <<Model>> {
+        + Long id
+        + String name
+        + String email
+    }
+}
+
+package "Exception & Handler" {
+    class NoTasksFoundException <<Exception>> {
+        + String message
+    }
+
+    class PasswordMismatchException <<Exception>> {
+        + String message
+    }
+
+    class PasswordRequiredException <<Exception>> {
+        + String message
+    }
+
+    class ResourceNotFoundException <<Exception>> {
+        + String message
+    }
+
+    class TasksNotFoundException <<Exception>> {
+        + String message
+    }
+
+    class GlobalExceptionHandler <<ControllerAdvice>> {
+        + ResponseEntity<String> handleNoTasksFoundException(NoTasksFoundException ex)
+        + ResponseEntity<String> handlePasswordMismatchException(PasswordMismatchException ex)
+        + ResponseEntity<String> handlePasswordRequiredException(PasswordRequiredException ex)
+        + ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex)
+        + ResponseEntity<String> handleTasksNotFoundException(TasksNotFoundException ex)
+        + ResponseEntity<String> handleException(Exception ex)
+    }
+}
+
+package "Database" {
+    class TaskTable <<Database>> {
+        + Long id
+        + String title
+        + String description
+        + Long assigneeId
+        + String modifiedDate
+    }
+
+    class AssigneeTable <<Database>> {
+        + Long id
+        + String name
+        + String email
+    }
+}
+
+JdbcTaskRepository --> JdbcTemplate : 호출
+JdbcAssigneeRepository --> JdbcTemplate : 호출
+
+note bottom of JdbcTemplate
+JdbcTemplate은 Spring 프레임워크에서 제공하는 데이터베이스 접근 유틸리티 클래스입니다.
+Repository 클래스들은 이 클래스를 사용하여 SQL 쿼리를 실행하고 결과를 처리합니다.
+end note
+
+TaskController --> TaskService : 호출
+TaskService --> TaskRepository : 호출
+TaskService -down-> TaskDto : 반환
+TaskRepository --> Task : 저장
+TaskRepository --> TaskTable : 매핑
+
+TaskService -left-> AssigneeService : 호출
+AssigneeService --> AssigneeRepository : 호출
+AssigneeService -down-> AssigneeDto : 반환
+AssigneeRepository --> Assignee : 저장
+AssigneeRepository --> AssigneeTable : 매핑
+
+TaskController --> GlobalExceptionHandler : 예외처리
+AssigneeController --> GlobalExceptionHandler : 예외처리
+
+note bottom
+[ 다이어그램 해설 ]
+- TaskController와 AssigneeController는 각각 TaskService와 AssigneeService를 호출하여 비즈니스 로직을 처리합니다.
+- TaskService는 TaskRepository와 상호작용하여 데이터베이스 작업을 수행하며,
+- AssigneeService와의 관계를 통해 필요한 Assignee 정보를 처리합니다.
+- JdbcTaskRepository와 JdbcAssigneeRepository는 JdbcTemplate를 사용하여 데이터베이스 작업을 수행합니다.
+- DTOs(TaskDto, AssigneeDto)는 데이터 전송을 위해 사용되며,
+- Model(Task, Assignee)은 실제 데이터베이스 테이블(TaskTable, AssigneeTable)과 매핑됩니다.
+- GlobalExceptionHandler는 모든 컨트롤러에서 발생하는 예외를 처리합니다.
+end note
+
+@enduml

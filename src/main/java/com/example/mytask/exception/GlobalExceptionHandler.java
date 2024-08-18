@@ -93,4 +93,5 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNoTasksFoundException(NoTasksFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+
 }

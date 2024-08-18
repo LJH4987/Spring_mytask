@@ -1,0 +1,113 @@
+# Assign API CRUD 명세서
+
+###
+# 환경 변수 설정
+# 해당 파일은 IntelliJ HTTP Client를 통해 테스트하기 위해 localhost URL로 설정되어 있습니다.
+# 예시: {{base_url}} -> http://localhost:8080
+
+###
+# @name 담당자 생성
+# POST 메서드를 사용하여 새로운 담당자를 생성하는 요청입니다.
+# 서버에 이름과 이메일을 포함한 담당자 정보를 보냅니다.
+POST http://localhost:8080/assignees
+Content-Type: application/json
+
+{
+  "name": "김춘추",
+  "email": "sinla@example.com"
+}
+
+###
+# @name 담당자 생성 - 중복된 이메일
+# POST 메서드를 사용하여 새로운 담당자를 생성하는 요청입니다.
+# 위에 담당자 생성후 똑같은 이메일로 생성하는 경우 400 상태 코드를 반환합니다.
+# 중복된 이메일이 존재하는 경우 400 상태 코드를 반환하는지 확인하는 테스트입니다.
+POST http://localhost:8080/assignees
+Content-Type: application/json
+
+{
+  "name": "똑같은 이메일로 생성",
+  "email": "sinla@example.com"
+}
+
+###
+
+# @name 담당자 생성 - 잘못된 요청
+# 필수 필드가 누락된 경우 400 상태 코드를 반환하는지 확인하는 테스트입니다.
+POST http://localhost:8080/assignees
+Content-Type: application/json
+
+{
+  "email": "담당자 이름 없음 및 이상한 이메일 주소"
+}
+###
+# @name 담당자 생성 - 잘못된 이메일 주소
+POST http://localhost:8080/assignees
+Content-Type: application/json
+
+{
+  "name": "김춘추",
+  "email": "이메일 이상해요"
+}
+
+###
+
+# @name 담당자 조회 - 전체
+# 이 요청은 모든 담당자 정보를 조회합니다. GET 메서드를 사용하여
+# 서버로부터 모든 담당자 데이터를 가져옵니다.
+GET http://localhost:8080/assignees
+Content-Type: application/json
+
+###
+
+# @name 담당자 조회 - ID
+# 이 요청은 특정 ID에 해당하는 담당자 정보를 조회합니다.
+# 예시에서는 ID가 1인 담당자의 정보를 가져옵니다.
+GET http://localhost:8080/assignees/1
+Content-Type: application/json
+
+###
+
+# @name 담당자 조회 - ID - 잘못된 요청
+# 존재하지 않는 담당자의 ID를 조회하는 경우 404 상태 코드를 반환하는지 확인하는 테스트입니다.
+GET http://localhost:8080/assignees/100000000
+Content-Type: application/json
+
+###
+
+# @name 담당자 수정
+# 이 요청은 기존 담당자의 정보를 수정합니다. PUT 메서드를 사용하여
+# 담당자의 이름과 이메일을 업데이트합니다. 기본 설정은 ID가 3인 담당자인 정보를 수정합니다.
+PUT http://localhost:8080/assignees/3
+Content-Type: application/json
+
+{
+  "name": "귀염둥이",
+  "email": "QWER@example.com"
+}
+
+###
+
+# @name 담당자 수정 - 잘못된 요청
+# 존재하지 않는 담당자를 수정하는 경우 404 상태 코드를 반환하는지 확인하는 테스트입니다.
+PUT http://localhost:8080/assignees/1000000
+Content-Type: application/json
+
+{
+  "name": "귀염둥이",
+  "email": "QWER@example.com"
+}
+
+###
+
+# @name 담당자 삭제
+# 이 요청은 특정 ID에 해당하는 담당자를 삭제합니다.
+# DELETE 메서드를 사용하여 서버에서 해당 담당자 정보를 삭제합니다.
+# 기본 설정은 ID가 2인 담당자를 삭제합니다.
+DELETE http://localhost:8080/assignees/2
+
+###
+
+# @name 담당자 삭제
+# 존재하지 않는 담당자를 삭제하는 경우 404 상태 코드를 반환하는지 확인하는 테스트입니다.
+DELETE http://localhost:8080/assignees/10000000000

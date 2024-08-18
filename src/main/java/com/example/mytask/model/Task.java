@@ -22,7 +22,7 @@ public class Task extends TaskDto {
     @Column(name = "assignee_name", nullable = false, length = 100)
     private String assigneeName;
 
-    @Column(nullable = true)
+    @Column(nullable = false , length = 100)
     private String password;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -87,4 +87,5 @@ public class Task extends TaskDto {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }

@@ -1,0 +1,89 @@
+# Task API CRUD 명세서
+
+###
+# 환경 변수 설정
+# 환경에 따라 기본 URL을 설정합니다.
+# 환경 변수를 사용하여 테스트 환경에 따라 URL을 변경할 수 있어 테스트를 보다 효율적으로 진행합니다.
+# 해당 파일은 IntelliJ HTTP Client를 통해 테스트하기 위해 localhost URL로 설정되어 있습니다.
+# postman에서도 사용 가능합니다.
+# 예시: {{base_url}} -> http://localhost:8080
+
+###
+# @name 일정 생성
+# POST 메서드를 사용하여 새로운 일정을 생성하는 요청입니다.
+# 서버에 일정 이름, 담당자 ID, 비밀번호를 포함한 일정에 관한 정보를 보냅니다
+POST http://localhost:8080/tasks
+Content-Type: application/json
+
+{
+  "taskName": "새로운 일정 생성",
+  "assigneeId": 1,
+  "password": "psd123456"
+}
+
+###
+
+# @name 일정 조회 - 전체
+# GET 메서드를 사용하여 모든 일정을 조회합니다.
+GET http://localhost:8080/tasks
+
+###
+
+# @name 일정조회 - ID
+# 이 요청은 특정 ID에 해당하는 일정 정보를 조회합니다.
+# 해당 파일에서는 ID가 1인 일정을 가져옵니다.
+GET http://localhost:8080/tasks/1
+Content-Type: application/json
+
+###
+
+# @name 일정조회 - 담당자
+# 특정 담당자 이름으로 일정들을 조회하는 요청입니다.
+# 해당 파일에서는 담장자 이름이 김두한인 일정들을 가져옵니다.
+GET http://localhost:8080/tasks/search/assignee?assigneeName=김두한
+
+###
+
+# @name 일정 조회 - 수정일
+# 특정 수정일 기준으로 일정들을 조회하는 요청입니다.
+# 해당 파일에서는 수정일이 2024-08-15인 일정들을 가져옵니다.
+GET http://localhost:8080/tasks/search/modified-date?modifiedDate=2024-08-15&page=0&size=10
+
+###
+
+# @name 일정 조회 - 담당자+수정일
+# 특정 담당자 이름과 수정일을 기준으로 일정들을 조회하는 요청입니다.
+# 해당 파일에서는 담당자 이름이 홍길동이고 수정일이 2024-08-15인 일정들을 가져옵니다.
+# 담당자이름만 있을 경우 , 수정일만 있을경우 , 둘다 없을경우 전부 테스트 가능합니다.
+# 담당자 이름만 = 담당자 이름기준으로 전체조회 , 수정일만 = 수정일 기준 전체 조회 , 둘다 없을 경우 = 전체 조회
+GET http://localhost:8080/tasks?assigneeName=홍길동&modifiedDate=2024-08-15
+###
+# @name 일정 조회 - 담당자만
+GET http://localhost:8080/tasks?assigneeName=홍길동&modifiedDate=
+###
+# @name 일정 조회 - 수정일만
+GET http://localhost:8080/tasks?assigneeName=&modifiedDate=2024-08-15
+###
+# @name 일정 조회 - 둘다없을 경우
+GET http://localhost:8080/tasks?assigneeName=&modifiedDate=
+
+###
+
+# @name 일정 수정
+# 특정 ID의 일정을 수정하는 요청입니다. 비밀번호와 함께 새로운 일정을 전달합니다.
+# 해당 파일에서는 수정 요청 시 ID가 1이며 비밀번호가 password123인 일정을 수정합니다.
+# 기본 설정은 일정 ID가 1이며 비밀번호가 password123인 일정의 일정과 담당자 ID를 수정합니다.
+PUT http://localhost:8080/tasks/1?password=password123
+Content-Type: application/json
+
+{
+  "taskName": "수정된 일정9999",
+  "assigneeId": 2
+}
+
+###
+
+# @name 일정 삭제
+# 특정 ID의 일정을 삭제하는 요청입니다. 요청 시 비밀번호를 함께 전달합니다.
+# 기본 설정 에서는 ID가 1이며 비밀번호가 password123인 일정을 삭제합니다.
+DELETE http://localhost:8080/tasks/1?password=password123

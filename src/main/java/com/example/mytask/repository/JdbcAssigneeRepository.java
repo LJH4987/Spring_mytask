@@ -80,4 +80,5 @@ public class JdbcAssigneeRepository implements AssigneeRepository {
             return assignee;
         }
     }
+
 }
