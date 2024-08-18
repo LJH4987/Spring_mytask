@@ -11,15 +11,14 @@ import java.time.LocalDateTime;
 
 import java.util.*;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AssigneeService {
 
     private final AssigneeRepository assigneeRepository;
-
-    public AssigneeService(AssigneeRepository assigneeRepository) {
-        this.assigneeRepository = assigneeRepository;
-    }
 
     public List<Assignee> getAllAssignees() {
         return assigneeRepository.findAll();

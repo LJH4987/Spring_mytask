@@ -2,6 +2,7 @@ package com.example.mytask.controller;
 
 import com.example.mytask.dto.TaskDto;
 import com.example.mytask.service.TaskService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -9,16 +10,16 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.*;
 
+import lombok.RequiredArgsConstructor;
+
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/tasks")
 @Validated
 public class TaskController {
 
     private final TaskService taskService;
-
-    public TaskController(TaskService taskService) {
-        this.taskService = taskService;
-    }
 
     @GetMapping
     public List<TaskDto> getAllTasks(

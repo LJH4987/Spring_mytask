@@ -7,6 +7,11 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class TaskDto {
 
     @NotBlank(message = "일정 내용은 필수입니다.")
@@ -23,47 +28,5 @@ public class TaskDto {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-    // Getters
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public Long getAssigneeId() {
-        return assigneeId;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    // Setters
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
-
-    public void setAssigneeId(Long assigneeId) {
-        this.assigneeId = assigneeId;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
 }

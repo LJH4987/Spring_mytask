@@ -4,22 +4,21 @@ import com.example.mytask.dto.AssigneeDto;
 import com.example.mytask.model.Assignee;
 import com.example.mytask.service.AssigneeService;
 
-import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 import java.util.*;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/assignees")
 public class AssigneeController {
 
     private final AssigneeService assigneeService;
-
-    public AssigneeController(AssigneeService assigneeService) {
-        this.assigneeService = assigneeService;
-    }
 
     @GetMapping
     public List<Assignee> getAllAssignees() {

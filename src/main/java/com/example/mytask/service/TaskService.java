@@ -18,17 +18,15 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class TaskService {
 
     private final TaskRepository taskRepository;
     private final PageableHandlerMethodArgumentResolverCustomizer pageableCustomizer;
-
-    public TaskService(TaskRepository taskRepository, PageableHandlerMethodArgumentResolverCustomizer pageableCustomizer) {
-        this.taskRepository = taskRepository;
-        this.pageableCustomizer = pageableCustomizer;
-    }
 
     public List<TaskDto> getAllTasks(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
